@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathOwl - Kuis Matematika Seru</title>
+    <!-- Tailwind CSS CDN first -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#0B192C',
+                            900: '#1E3E62',
+                        },
+                        royal: {
+                            500: '#2563EB',
+                            600: '#1D4ED8',
+                            700: '#1E40AF',
+                        },
+                        skylight: '#E0F2FE',
+                        ice: '#F0F9FF'
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3E62 50%, #0284C7 100%);
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .glass-card-dark {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .option-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2563EB;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-3 sm:p-6 text-slate-800 antialiased relative overflow-x-hidden min-h-screen">
+
+    <!-- Floating Background Math Symbols -->
+    <div class="fixed inset-0 pointer-events-none opacity-10 flex flex-wrap justify-between p-10 select-none text-white text-6xl font-bold z-0">
+        <span class="animate-float" style="animation-delay: 0s;">∑</span>
+        <span class="animate-float" style="animation-delay: 0.5s;">√</span>
+        <span class="animate-float" style="animation-delay: 1s;">π</span>
+        <span class="animate-float" style="animation-delay: 1.5s;">x²</span>
+        <span class="animate-float" style="animation-delay: 2s;">÷</span>
+        <span class="animate-float" style="animation-delay: 2.5s;">+</span>
+        <span class="animate-float" style="animation-delay: 3s;">∞</span>
+        <span class="animate-float" style="animation-delay: 3.5s;">%</span>
+    </div>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-2xl z-10 relative my-auto">
+
+        <!-- ================= PAGE 1: START / MENU MENU ================= -->
+        <section id="start-screen" class="glass-card rounded-3xl p-6 sm:p-8 text-center transition-all duration-300">
+            <!-- Mascot Container -->
+            <div class="relative w-36 h-36 mx-auto mb-4">
+                <div class="absolute inset-0 bg-sky-400 rounded-full blur-xl opacity-40 animate-pulse"></div>
+                <!-- SVG Owl Mascot -->
+                <svg id="owl-mascot-start" class="w-full h-full relative z-10 animate-float" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Body -->
+                    <ellipse cx="100" cy="115" rx="65" ry="60" fill="#1D4ED8"/>
+                    <ellipse cx="100" cy="120" rx="45" ry="40" fill="#93C5FD"/>
+                    <!-- Wings -->
+                    <path d="M35 110 C 20 120, 20 150, 40 155 C 45 140, 40 120, 35 110" fill="#1E40AF"/>
+                    <path d="M165 110 C 180 120, 180 150, 160 155 C 155 140, 160 120, 165 110" fill="#1E40AF"/>
+                    <!-- Ears/Tufts -->
+                    <polygon points="50,60 70,25 80,60" fill="#1E40AF"/>
+                    <polygon points="150,60 130,25 120,60" fill="#1E40AF"/>
+                    <!-- Graduation Cap -->
+                    <polygon points="100,10 40,30 100,50 160,30" fill="#0F172A"/>
+                    <rect x="80" y="32" width="40" height="15" fill="#1E293B"/>
+                    <path d="M150 33 L150 65" stroke="#F59E0B" stroke-width="4"/>
+                    <circle cx="150" cy="67" r="4" fill="#F59E0B"/>
+                    <!-- Eyes Outer -->
+                    <circle cx="70" cy="80" r="24" fill="#FFFFFF"/>
+                    <circle cx="130" cy="80" r="24" fill="#FFFFFF"/>
+                    <circle cx="70" cy="80" r="20" fill="#DBEAFE"/>
+                    <circle cx="130" cy="80" r="20" fill="#DBEAFE"/>
+                    <!-- Pupils -->
+                    <circle id="left-pupil" cx="72" cy="80" r="10" fill="#0F172A"/>
+                    <circle id="right-pupil" cx="128" cy="80" r="10" fill="#0F172A"/>
+                    <!-- Eye shine -->
+                    <circle cx="68" cy="76" r="4" fill="#FFFFFF"/>
+                    <circle cx="124" cy="76" r="4" fill="#FFFFFF"/>
+                    <!-- Glasses -->
+                    <circle cx="70" cy="80" r="23" stroke="#0F172A" stroke-width="4" fill="none"/>
+                    <circle cx="130" cy="80" r="23" stroke="#0F172A" stroke-width="4" fill="none"/>
+                    <line x1="93" y1="80" x2="107" y2="80" stroke="#0F172A" stroke-width="4"/>
+                    <!-- Beak -->
+                    <polygon points="100,88 90,102 110,102" fill="#F59E0B"/>
+                    <!-- Feet -->
+                    <ellipse cx="80" cy="175" rx="12" ry="6" fill="#F59E0B"/>
+                    <ellipse cx="120" cy="175" rx="12" ry="6" fill="#F59E0B"/>
+                </svg>
+            </div>
+
+            <!-- Speech Bubble -->
+            <div class="inline-block bg-blue-100 text-blue-900 font-semibold px-4 py-2 rounded-2xl mb-4 relative shadow-sm border border-blue-200">
+                <p id="owl-greeting">Halo! Siap menguji kemampuan matematikamu bersama Prof. Owly?</p>
+                <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-b-8 border-b-blue-100"></div>
+            </div>
+
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-950 mb-1 tracking-tight">MathOwl Quiz</h1>
+            <p class="text-slate-600 text-sm mb-6">Asah Otak & Tingkatkan Kecepatan Berhitung!</p>
+
+            <!-- Input Nama -->
+            <div class="mb-6 text-left max-w-md mx-auto">
+                <label for="player-name" class="block text-xs font-bold text-blue-900 uppercase tracking-wider mb-2">Nama Pemain / Nama Kelompok</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-blue-500">
+                        <i class="fa-solid fa-user"></i>
+                    </span>
+                    <input type="text" id="player-name" placeholder="Masukkan nama Anda di sini..." 
+                        class="w-full pl-10 pr-4 py-3 bg-white/90 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all shadow-sm font-medium text-slate-800">
+                </div>
+                <p id="name-error" class="text-red-500 text-xs mt-1 hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i>Silakan masukkan nama terlebih dahulu!</p>
+            </div>
+
+            <!-- Pilihan Mode Quiz -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
+                <!-- Mode Individu -->
+                <button onclick="selectMode('individual')" class="group p-5 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/30 transition-all duration-200 transform hover:-translate-y-1 text-left relative overflow-hidden border border-blue-400">
+                    <div class="absolute -right-4 -bottom-4 opacity-20 text-white text-6xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-user-astronaut"></i>
+                        </div>
+                        <span class="font-bold text-lg">Mode Individu</span>
+                    </div>
+                    <p class="text-blue-100 text-xs">5 Soal Tantangan Singkat</p>
+                    <div class="mt-3 inline-flex items-center text-xs font-semibold bg-white/20 px-2.5 py-1 rounded-full">
+                        <i class="fa-regular fa-clock mr-1"></i> Waktu: 2 Menit
+                    </div>
+                </button>
+
+                <!-- Mode Kelompok -->
+                <button onclick="selectMode('group')" class="group p-5 bg-gradient-to-br from-indigo-600 to-blue-800 hover:from-indigo-700 hover:to-blue-900 text-white rounded-2xl shadow-lg shadow-indigo-600/30 transition-all duration-200 transform hover:-translate-y-1 text-left relative overflow-hidden border border-indigo-400">
+                    <div class="absolute -right-4 -bottom-4 opacity-20 text-white text-6xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-users-gear"></i>
+                        </div>
+                        <span class="font-bold text-lg">Mode Kelompok</span>
+                    </div>
+                    <p class="text-indigo-100 text-xs">10 Soal Kerjasama Tim</p>
+                    <div class="mt-3 inline-flex items-center text-xs font-semibold bg-white/20 px-2.5 py-1 rounded-full">
+                        <i class="fa-regular fa-clock mr-1"></i> Waktu: 2 Menit
+                    </div>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ================= PAGE 2: QUIZ INTERFACE ================= -->
+        <section id="quiz-screen" class="glass-card rounded-3xl p-5 sm:p-8 hidden transition-all duration-300">
+            <!-- Header Bar (Timer, Mascot Small, Progress) -->
+            <div class="flex items-center justify-between gap-4 mb-4 pb-4 border-b border-blue-100">
+                <!-- Player & Mode Info -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold border border-blue-300">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h3 id="display-player-name" class="font-bold text-slate-800 text-sm line-clamp-1">Pemain</h3>
+                        <span id="display-mode-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 uppercase tracking-wider">Individu</span>
+                    </div>
+                </div>
+
+                <!-- Timer -->
+                <div id="timer-box" class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3.5 py-1.5 rounded-xl transition-colors">
+                    <i class="fa-regular fa-clock text-blue-600 text-lg" id="timer-icon"></i>
+                    <span id="timer-text" class="font-mono font-bold text-slate-800 text-base sm:text-lg">02:00</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-5">
+                <div class="flex justify-between text-xs font-semibold text-slate-500 mb-1">
+                    <span id="question-progress-text">Soal 1 dari 5</span>
+                    <span id="score-live-text">Skor: 0</span>
+                </div>
+                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                    <div id="progress-bar-fill" class="bg-blue-600 h-full rounded-full transition-all duration-300 w-0"></div>
+                </div>
+            </div>
+
+            <!-- Mascot & Question Area -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center mb-6">
+                <!-- Mini Owl Expressions -->
+                <div class="md:col-span-1 flex flex-col items-center justify-center bg-blue-50/70 p-3 rounded-2xl border border-blue-100">
+                    <div class="w-20 h-20 relative">
+                        <svg id="owl-quiz-mascot" class="w-full h-full" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Body -->
+                            <ellipse cx="100" cy="115" rx="65" ry="60" fill="#1D4ED8"/>
+                            <ellipse cx="100" cy="120" rx="45" ry="40" fill="#93C5FD"/>
+                            <!-- Ears -->
+                            <polygon points="50,60 70,25 80,60" fill="#1E40AF"/>
+                            <polygon points="150,60 130,25 120,60" fill="#1E40AF"/>
+                            <!-- Eyes -->
+                            <circle cx="70" cy="80" r="24" fill="#FFFFFF"/>
+                            <circle cx="130" cy="80" r="24" fill="#FFFFFF"/>
+                            <!-- Expressions pupils -->
+                            <g id="owl-eyes-normal">
+                                <circle cx="72" cy="80" r="10" fill="#0F172A"/>
+                                <circle cx="128" cy="80" r="10" fill="#0F172A"/>
+                                <circle cx="68" cy="76" r="4" fill="#FFFFFF"/>
+                                <circle cx="124" cy="76" r="4" fill="#FFFFFF"/>
+                            </g>
+                            <!-- Glasses -->
+                            <circle cx="70" cy="80" r="23" stroke="#0F172A" stroke-width="4" fill="none"/>
+                            <circle cx="130" cy="80" r="23" stroke="#0F172A" stroke-width="4" fill="none"/>
+                            <line x1="93" y1="80" x2="107" y2="80" stroke="#0F172A" stroke-width="4"/>
+                            <!-- Beak -->
+                            <polygon points="100,88 90,102 110,102" fill="#F59E0B"/>
+                        </svg>
+                    </div>
+                    <span id="owl-status-text" class="text-[11px] font-medium text-blue-900 mt-1 text-center italic">"Semangat! Kamu pasti bisa!"</span>
+                </div>
+
+                <!-- Question Box -->
+                <div class="md:col-span-3 bg-white p-5 rounded-2xl border border-blue-100 shadow-sm min-h-[110px] flex items-center justify-center text-center">
+                    <h2 id="question-text" class="text-lg sm:text-xl font-bold text-slate-800 leading-snug">
+                        Memuat pertanyaan...
+                    </h2>
+                </div>
+            </div>
+
+            <!-- Options Grid -->
+            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                <!-- JS Inject Option Buttons Here -->
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="confirmQuit()" class="text-xs font-semibold text-slate-400 hover:text-red-500 transition-colors flex items-center">
+                    <i class="fa-solid fa-arrow-left mr-1.5"></i> Keluar Quiz
+                </button>
+                <div class="text-xs text-slate-400 font-medium">
+                    <i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Pilih jawaban yang paling tepat
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= PAGE 3: RESULT SCREEN ================= -->
+        <section id="result-screen" class="glass-card rounded-3xl p-6 sm:p-8 text-center hidden transition-all duration-300">
+            <!-- Mascot Reaction -->
+            <div class="relative w-32 h-32 mx-auto mb-3">
+                <svg id="owl-result-mascot" class="w-full h-full animate-bounce-slow" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Base Owl SVG -->
+                    <ellipse cx="100" cy="115" rx="65" ry="60" fill="#1D4ED8"/>
+                    <ellipse cx="100" cy="120" rx="45" ry="40" fill="#93C5FD"/>
+                    <polygon points="50,60 70,25 80,60" fill="#1E40AF"/>
+                    <polygon points="150,60 130,25 120,60" fill="#1E40AF"/>
+                    <!-- Eyes -->
+                    <circle cx="70" cy="80" r="24" fill="#FFFFFF"/>
+                    <circle cx="130" cy="80" r="24" fill="#FFFFFF"/>
+                    <circle cx="70" cy="80" r="10" fill="#0F172A"/>
+                    <circle cx="130" cy="80" r="10" fill="#0F172A"/>
+                    <!-- Glasses -->
+                    <circle cx="70" cy="80" r="23" stroke="#0F172A" stroke-width="4" fill="none"/>
+                    <circle cx="130" cy="80" r="23" stroke="#0F172A" stroke-width="4" fill="none"/>
+                    <line x1="93" y1="80" x2="107" y2="80" stroke="#0F172A" stroke-width="4"/>
+                    <!-- Beak -->
+                    <polygon points="100,88 90,102 110,102" fill="#F59E0B"/>
+                    <!-- Crown or Trophy element for high score -->
+                    <path id="result-crown" d="M85 20 L92 35 L100 20 L108 35 L115 20 L115 40 L85 40 Z" fill="#F59E0B" class="hidden"/>
+                </svg>
+            </div>
+
+            <!-- Result Message Badge -->
+            <span id="result-badge" class="inline-block px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 mb-2">
+                Hasil Akhir
+            </span>
+
+            <h2 id="result-title" class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-1">
+                Luar Biasa!
+            </h2>
+            <p id="result-subtitle" class="text-sm text-slate-600 mb-6">Kamu telah menyelesaikan quiz matematika ini!</p>
+
+            <!-- Score Big Box -->
+            <div class="bg-gradient-to-br from-blue-900 to-indigo-900 text-white rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/20 rounded-full blur-xl"></div>
+                
+                <div class="text-xs uppercase tracking-widest text-blue-200 font-semibold mb-1">Total Skor Anda</div>
+                <div id="final-score" class="text-5xl sm:text-6xl font-black text-amber-400 mb-2">100</div>
+                
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-3 gap-2 border-t border-blue-800/80 pt-4 mt-4 text-center">
+                    <div>
+                        <div class="text-[11px] text-blue-200">Akurasi</div>
+                        <div id="final-accuracy" class="text-base sm:text-lg font-bold text-white">100%</div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] text-blue-200">Benar / Salah</div>
+                        <div id="final-correct-wrong" class="text-base sm:text-lg font-bold text-emerald-400">10 / 0</div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] text-blue-200">Waktu Terpakai</div>
+                        <div id="final-time" class="text-base sm:text-lg font-bold text-white">01:15</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Owly -->
+            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6 text-left flex items-start space-x-3">
+                <div class="text-blue-600 text-2xl mt-0.5"><i class="fa-solid fa-quote-left"></i></div>
+                <div>
+                    <h4 class="font-bold text-blue-900 text-sm">Pesan dari Prof. Owly:</h4>
+                    <p id="owl-feedback-text" class="text-xs sm:text-sm text-slate-700 mt-0.5 leading-relaxed">
+                        "Kemampuan matematikamu sangat hebat! Pertahankan prestasimu dan teruslah berlatih!"
+                    </p>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="restartQuiz()" class="flex-1 py-3.5 px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Coba Lagi</span>
+                </button>
+                <button onclick="goToHome()" class="flex-1 py-3.5 px-5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl transition-all flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Menu Utama</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Custom Modal Confirm Exit -->
+    <div id="quit-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl border border-slate-100">
+            <div class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="font-bold text-slate-800 text-lg mb-1">Keluar dari Quiz?</h3>
+            <p class="text-xs text-slate-500 mb-5">Progres quiz saat ini akan hilang dan tidak disimpan.</p>
+            <div class="flex space-x-3">
+                <button onclick="closeQuitModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl text-xs hover:bg-slate-200">Batal</button>
+                <button onclick="exitQuiz()" class="flex-1 py-2.5 bg-red-600 text-white font-semibold rounded-xl text-xs hover:bg-red-700 shadow-md shadow-red-600/20">Ya, Keluar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* ================= DATABASE SOAL MATEMATIKA ================= */
+        const questionBank = [
+            // Soal Pilihan untuk Individual (5) & Kelompok (10)
+            {
+                question: "Berapakah hasil dari 15 + 27 × 2?",
+                options: ["69", "84", "68", "74"],
+                answer: 0 // 15 + 54 = 69
+            },
+            {
+                question: "Sebuah persegi panjang memiliki panjang 12 cm dan lebar 8 cm. Berapakah luasnya?",
+                options: ["40 cm²", "96 cm²", "80 cm²", "64 cm²"],
+                answer: 1 // 12 * 8 = 96
+            },
+            {
+                question: "Jika 3x + 5 = 20, berapakah nilai x?",
+                options: ["3", "4", "5", "6"],
+                answer: 2 // 3x = 15 => x = 5
+            },
+            {
+                question: "Berapakah hasil dari 144 ÷ 12 + 18?",
+                options: ["28", "30", "32", "26"],
+                answer: 1 // 12 + 18 = 30
+            },
+            {
+                question: "Lanjutkan deret angka berikut: 2, 4, 8, 16, ...",
+                options: ["24", "28", "32", "36"],
+                answer: 2 // 32
+            },
+            {
+                question: "Berapakah 25% dari 200?",
+                options: ["25", "40", "50", "75"],
+                answer: 2 // 50
+            },
+            {
+                question: "Sebuah segitiga memiliki alas 10 cm dan tinggi 12 cm. Berapakah luas segitiga tersebut?",
+                options: ["120 cm²", "60 cm²", "30 cm²", "90 cm²"],
+                answer: 1 // (10*12)/2 = 60
+            },
+            {
+                question: "Berapakah hasil dari 7² - 4²?",
+                options: ["33", "25", "21", "15"],
+                answer: 0 // 49 - 16 = 33
+            },
+            {
+                question: "Ibu membeli 3 kg apel seharga Rp 45.000. Berapa harga 5 kg apel?",
+                options: ["Rp 60.000", "Rp 75.000", "Rp 80.000", "Rp 90.000"],
+                answer: 1 // 15.000 * 5 = 75.000
+            },
+            {
+                question: "Berapakah nilai dari √169?",
+                options: ["11", "12", "13", "14"],
+                answer: 2 // 13
+            },
+            {
+                question: "Berapakah hasil dari (18 - 6) × (4 + 2)?",
+                options: ["60", "72", "84", "96"],
+                answer: 1 // 12 * 6 = 72
+            },
+            {
+                question: "Sebuah kubus memiliki panjang rusuk 5 cm. Berapakah volume kubus tersebut?",
+                options: ["100 cm³", "125 cm³", "150 cm³", "75 cm³"],
+                answer: 1 // 5^3 = 125
+            }
+        ];
+
+        /* ================= GAME STATE VARIABLES ================= */
+        let currentMode = 'individual'; // 'individual' or 'group'
+        let playerName = '';
+        let activeQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswersCount = 0;
+        let wrongAnswersCount = 0;
+        
+        // Timer variables
+        const TOTAL_TIME = 120; // 2 menit = 120 detik
+        let timeLeft = TOTAL_TIME;
+        let timerInterval = null;
+
+        /* ================= DOM ELEMENTS ================= */
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const inputPlayerName = document.getElementById('player-name');
+        const nameError = document.getElementById('name-error');
+
+        /* ================= GAME LOGIC FUNCTIONS ================= */
+
+        // 1. Pilih Mode & Mulai Quiz
+        function selectMode(mode) {
+            const nameValue = inputPlayerName.value.trim();
+            if (!nameValue) {
+                nameError.classList.remove('hidden');
+                inputPlayerName.focus();
+                return;
+            }
+            nameError.classList.add('hidden');
+
+            currentMode = mode;
+            playerName = nameValue;
+
+            // Setup Pertanyaan
+            // Acak pertanyaan dan ambil sesuai mode
+            const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+            const count = (currentMode === 'group') ? 10 : 5;
+            activeQuestions = shuffled.slice(0, count);
+
+            // Reset Stats
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswersCount = 0;
+            wrongAnswersCount = 0;
+            timeLeft = TOTAL_TIME;
+
+            // Update Header Display
+            document.getElementById('display-player-name').innerText = playerName;
+            const badge = document.getElementById('display-mode-badge');
+            if (currentMode === 'group') {
+                badge.innerText = "Kelompok (10 Soal)";
+                badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 uppercase tracking-wider";
+            } else {
+                badge.innerText = "Individu (5 Soal)";
+                badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 uppercase tracking-wider";
+            }
+
+            // Pindah Layar
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+
+            // Jalankan Timer & Tampilkan Soal Pertama
+            startTimer();
+            loadQuestion();
+        }
+
+        // 2. Sistem Timer 2 Menit
+        function startTimer() {
+            clearInterval(timerInterval);
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    finishQuiz(true); // Finish because time out
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            const timerText = document.getElementById('timer-text');
+            const timerBox = document.getElementById('timer-box');
+            const timerIcon = document.getElementById('timer-icon');
+
+            timerText.innerText = timeString;
+
+            // Peringatan jika waktu < 15 detik
+            if (timeLeft <= 15) {
+                timerBox.className = "flex items-center space-x-2 bg-red-100 border border-red-300 px-3.5 py-1.5 rounded-xl transition-colors animate-pulse";
+                timerText.className = "font-mono font-bold text-red-600 text-base sm:text-lg";
+                timerIcon.className = "fa-regular fa-clock text-red-600 text-lg";
+            } else {
+                timerBox.className = "flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3.5 py-1.5 rounded-xl transition-colors";
+                timerText.className = "font-mono font-bold text-slate-800 text-base sm:text-lg";
+                timerIcon.className = "fa-regular fa-clock text-blue-600 text-lg";
+            }
+        }
+
+        // 3. Load Soal ke Layar
+        function loadQuestion() {
+            const q = activeQuestions[currentQuestionIndex];
+            const total = activeQuestions.length;
+
+            // Progress Text & Bar
+            document.getElementById('question-progress-text').innerText = `Soal ${currentQuestionIndex + 1} dari ${total}`;
+            document.getElementById('score-live-text').innerText = `Skor: ${score}`;
+            const progressPercent = ((currentQuestionIndex + 1) / total) * 100;
+            document.getElementById('progress-bar-fill').style.width = `${progressPercent}%`;
+
+            // Question Text
+            document.getElementById('question-text').innerText = q.question;
+
+            // Owl Normal Status
+            updateOwlStatus("normal");
+
+            // Render Option Buttons
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const optionLabels = ['A', 'B', 'C', 'D'];
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn w-full p-4 rounded-xl bg-white border border-blue-200 hover:border-blue-500 hover:bg-blue-50 text-left font-semibold text-slate-700 flex items-center justify-between shadow-sm transition-all`;
+                btn.onclick = () => checkAnswer(idx);
+
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">${optionLabels[idx]}</span>
+                        <span class="text-sm sm:text-base">${opt}</span>
+                    </div>
+                    <i class="fa-regular fa-circle text-slate-300 group-hover:text-blue-500"></i>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // 4. Cek Jawaban
+        function checkAnswer(selectedIndex) {
+            const q = activeQuestions[currentQuestionIndex];
+            const optionBtns = document.getElementById('options-container').children;
+
+            // Disable all buttons after click
+            for (let btn of optionBtns) {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-blue-500', 'hover:bg-blue-50');
+            }
+
+            if (selectedIndex === q.answer) {
+                // Benar
+                score += (100 / activeQuestions.length);
+                correctAnswersCount++;
+                optionBtns[selectedIndex].className = "w-full p-4 rounded-xl bg-emerald-50 border-2 border-emerald-500 text-emerald-900 font-semibold flex items-center justify-between shadow-md";
+                optionBtns[selectedIndex].innerHTML += `<i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i>`;
+                updateOwlStatus("happy");
+            } else {
+                // Salah
+                wrongAnswersCount++;
+                optionBtns[selectedIndex].className = "w-full p-4 rounded-xl bg-rose-50 border-2 border-rose-400 text-rose-900 font-semibold flex items-center justify-between shadow-md";
+                optionBtns[selectedIndex].innerHTML += `<i class="fa-solid fa-circle-xmark text-rose-500 text-xl"></i>`;
+
+                // Highlight Jawaban Benar
+                optionBtns[q.answer].className = "w-full p-4 rounded-xl bg-emerald-50 border-2 border-emerald-500 text-emerald-900 font-semibold flex items-center justify-between shadow-sm";
+                updateOwlStatus("thinking");
+            }
+
+            // Tunda sebentar sebelum lanjut ke soal berikutnya
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < activeQuestions.length) {
+                    loadQuestion();
+                } else {
+                    finishQuiz(false);
+                }
+            }, 1200);
+        }
+
+        // 5. Ekspresi Burung Hantu (Mascot)
+        function updateOwlStatus(state) {
+            const statusText = document.getElementById('owl-status-text');
+            const eyesNormal = document.getElementById('owl-eyes-normal');
+
+            if (state === "happy") {
+                statusText.innerText = '"Hebat! Jawabanmu Tepat!"';
+                statusText.className = "text-[11px] font-bold text-emerald-600 mt-1 text-center";
+            } else if (state === "thinking") {
+                statusText.innerText = '"Tetap semangat, coba lagi!"';
+                statusText.className = "text-[11px] font-bold text-rose-500 mt-1 text-center";
+            } else {
+                statusText.innerText = '"Semangat! Kamu pasti bisa!"';
+                statusText.className = "text-[11px] font-medium text-blue-900 mt-1 text-center italic";
+            }
+        }
+
+        // 6. Selesai Quiz (Selesai/Waktu Habis)
+        function finishQuiz(isTimeOut = false) {
+            clearInterval(timerInterval);
+
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const finalScoreVal = Math.round(score);
+            const totalQ = activeQuestions.length;
+            const accuracy = Math.round((correctAnswersCount / totalQ) * 100);
+            const timeUsedSeconds = TOTAL_TIME - timeLeft;
+            const timeUsedFormatted = `${Math.floor(timeUsedSeconds / 60).toString().padStart(2, '0')}:${(timeUsedSeconds % 60).toString().padStart(2, '0')}`;
+
+            document.getElementById('final-score').innerText = finalScoreVal;
+            document.getElementById('final-accuracy').innerText = `${accuracy}%`;
+            document.getElementById('final-correct-wrong').innerText = `${correctAnswersCount} / ${wrongAnswersCount}`;
+            document.getElementById('final-time').innerText = timeUsedFormatted;
+
+            // Crown setup
+            const crown = document.getElementById('result-crown');
+
+            // Custom Feedback berdasarkan nilai
+            const resultTitle = document.getElementById('result-title');
+            const resultSubtitle = document.getElementById('result-subtitle');
+            const resultBadge = document.getElementById('result-badge');
+            const owlFeedback = document.getElementById('owl-feedback-text');
+
+            if (isTimeOut) {
+                resultBadge.innerText = "Waktu Habis!";
+                resultBadge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800 mb-2";
+            }
+
+            if (finalScoreVal >= 80) {
+                resultTitle.innerText = "Luar Biasa, Genius!";
+                resultSubtitle.innerText = `Kerja bagus, ${playerName}! Hasil matematikamu sangat memuaskan!`;
+                owlFeedback.innerText = `"Wow! Kamu sangat cerdas! Semua rumus dan hitungan kamu lahap dengan sangat baik! Pertahankan terus!"`;
+                crown.classList.remove('hidden');
+                
+                // Trigger Confetti Effect
+                triggerConfetti();
+
+            } else if (finalScoreVal >= 50) {
+                resultTitle.innerText = "Bagus Sekali!";
+                resultSubtitle.innerText = `Nilai yang cukup baik, ${playerName}! Teruskan berlatih!`;
+                owlFeedback.innerText = `"Sudah bagus! Sedikit lagi kamu bisa meraih skor sempurna. Ayo coba satu kali lagi!"`;
+                crown.classList.add('hidden');
+            } else {
+                resultTitle.innerText = "Ayo Coba Lagi!";
+                resultSubtitle.innerText = `Jangan berkecil hati, ${playerName}! Matematika butuh latihan.`;
+                owlFeedback.innerText = `"Jangan menyerah! Matematika itu menyenangkan jika sering dilatih. Coba lagi dan jadilah lebih teliti!"`;
+                crown.classList.add('hidden');
+            }
+        }
+
+        // Confetti Celebration
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        // Navigation Actions
+        function restartQuiz() {
+            selectMode(currentMode);
+        }
+
+        function goToHome() {
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+
+        // Quit Modal Handling
+        function confirmQuit() {
+            document.getElementById('quit-modal').classList.remove('hidden');
+        }
+
+        function closeQuitModal() {
+            document.getElementById('quit-modal').classList.add('hidden');
+        }
+
+        function exitQuiz() {
+            clearInterval(timerInterval);
+            closeQuitModal();
+            goToHome();
+        }
+
+        // Interactive Mascot Eye Movement in Start Screen
+        document.addEventListener('mousemove', (e) => {
+            const mascot = document.getElementById('owl-mascot-start');
+            if (!mascot || startScreen.classList.contains('hidden')) return;
+
+            const leftPupil = document.getElementById('left-pupil');
+            const rightPupil = document.getElementById('right-pupil');
+
+            const rect = mascot.getBoundingClientRect();
+            const owlX = rect.left + rect.width / 2;
+            const owlY = rect.top + rect.height / 2;
+
+            const angle = Math.atan2(e.clientY - owlY, e.clientX - owlX);
+            const distance = Math.min(4, Math.hypot(e.clientX - owlX, e.clientY - owlY) / 30);
+
+            const moveX = Math.cos(angle) * distance;
+            const moveY = Math.sin(angle) * distance;
+
+            if (leftPupil && rightPupil) {
+                leftPupil.setAttribute('cx', 72 + moveX);
+                leftPupil.setAttribute('cy', 80 + moveY);
+                rightPupil.setAttribute('cx', 128 + moveX);
+                rightPupil.setAttribute('cy', 80 + moveY);
+            }
+        });
+    </script>
+</body>
+</html>
